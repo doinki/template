@@ -14,7 +14,6 @@ import { endTime, startTime, timing } from 'hono/timing';
 import type { ServerBuild } from 'react-router';
 import { createRequestHandler } from 'react-router-hono';
 import { gracefulShutdown } from 'server.close';
-import sourceMapSupport from 'source-map-support';
 
 process.chdir(join(import.meta.dirname, '..'));
 
@@ -28,20 +27,22 @@ declare module 'react-router' {
   }
 }
 
-sourceMapSupport.install({
-  retrieveSourceMap(source) {
-    const match = /^file:\/\/(.*)\?t=[\d.]+$/.exec(source);
+if (import.meta.env.DEV) {
+  (await import('source-map-support')).install({
+    retrieveSourceMap(source) {
+      const match = /^file:\/\/(.*)\?t=[\d.]+$/.exec(source);
 
-    if (match) {
-      return {
-        map: readFileSync(`${match[1]}.map`, 'utf8'),
-        url: source,
-      };
-    }
+      if (match) {
+        return {
+          map: readFileSync(`${match[1]}.map`, 'utf8'),
+          url: source,
+        };
+      }
 
-    return null;
-  },
-});
+      return null;
+    },
+  });
+}
 
 const app = new Hono<{ Variables: TimingVariables }>();
 
