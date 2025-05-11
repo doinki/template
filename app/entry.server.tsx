@@ -1,10 +1,17 @@
 import { PassThrough } from 'node:stream';
+import { styleText } from 'node:util';
 
 import { createReadableStreamFromReadable } from '@react-router/node';
+import * as Sentry from '@sentry/react-router';
 import { isbot } from 'isbot';
 import type { RenderToPipeableStreamOptions } from 'react-dom/server';
 import { renderToPipeableStream } from 'react-dom/server';
-import type { AppLoadContext, EntryContext } from 'react-router';
+import type {
+  ActionFunctionArgs,
+  AppLoadContext,
+  EntryContext,
+  LoaderFunctionArgs,
+} from 'react-router';
 import { ServerRouter } from 'react-router';
 
 import { init } from './env.server';
@@ -13,7 +20,7 @@ init();
 
 export const streamTimeout = 5000;
 
-export default function handleRequest(
+function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
@@ -40,7 +47,6 @@ export default function handleRequest(
           }
         },
         onShellError(error: unknown) {
-          // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
           reject(error);
         },
         [readyOption]() {
@@ -58,11 +64,33 @@ export default function handleRequest(
             }),
           );
 
-          pipe(body);
+          pipe(import.meta.env.SENTRY_DSN ? Sentry.getMetaTagTransformer(body) : body);
         },
       },
     );
 
     setTimeout(abort, streamTimeout + 1000);
   });
+}
+export default import.meta.env.SENTRY_DSN
+  ? Sentry.wrapSentryHandleRequest(handleRequest)
+  : handleRequest;
+
+export function handleError(
+  error: unknown,
+  { request }: LoaderFunctionArgs | ActionFunctionArgs,
+): void {
+  if (request.signal.aborted) {
+    return;
+  }
+
+  if (error instanceof Error) {
+    console.error(styleText('red', String(error.stack)));
+  } else {
+    console.error(error);
+  }
+
+  if (import.meta.env.SENTRY_DSN) {
+    Sentry.captureException(error);
+  }
 }

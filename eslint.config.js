@@ -23,9 +23,4 @@ export default config(
   unicornConfig.generateConfig(),
   sortConfig.generateConfig(),
   prettierConfig.generateConfig(),
-  {
-    rules: {
-      'jsx-a11y/anchor-is-valid': ['error', { components: ['Link'], specialLink: ['to'] }],
-    },
-  },
 );

@@ -2,7 +2,6 @@
 
 import 'dotenv/config';
 
-import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { serve } from '@hono/node-server';
@@ -14,6 +13,8 @@ import { endTime, startTime, timing } from 'hono/timing';
 import type { ServerBuild } from 'react-router';
 import { createRequestHandler } from 'react-router-hono';
 import { gracefulShutdown } from 'server.close';
+
+import { init } from './init';
 
 process.chdir(join(import.meta.dirname, '..'));
 
@@ -27,22 +28,7 @@ declare module 'react-router' {
   }
 }
 
-if (import.meta.env.DEV) {
-  (await import('source-map-support')).install({
-    retrieveSourceMap(source) {
-      const match = /^file:\/\/(.*)\?t=[\d.]+$/.exec(source);
-
-      if (match) {
-        return {
-          map: readFileSync(`${match[1]}.map`, 'utf8'),
-          url: source,
-        };
-      }
-
-      return null;
-    },
-  });
-}
+await init();
 
 const app = new Hono<{ Variables: TimingVariables }>();
 
@@ -79,8 +65,10 @@ app.get('*', async (c, next) => {
 app.use(logger());
 
 const serverBuild: ServerBuild = await (import.meta.env.PROD
-  ? // @ts-expect-error
-    import('../build/server/index.js')
+  ? import(
+      // @ts-expect-error
+      '../build/server/index.js'
+    )
   : import('virtual:react-router/server-build'));
 
 app.use(

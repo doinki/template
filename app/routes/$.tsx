@@ -1,10 +1,8 @@
 export function loader() {
-  // eslint-disable-next-line @typescript-eslint/only-throw-error
   throw new Response('Not found', { status: 404 });
 }
 
 export function action() {
-  // eslint-disable-next-line @typescript-eslint/only-throw-error
   throw new Response('Not found', { status: 404 });
 }
 
