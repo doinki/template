@@ -13,10 +13,30 @@ import type {
   LoaderFunctionArgs,
 } from 'react-router';
 import { ServerRouter } from 'react-router';
+import { z } from 'zod';
 
-import { init } from './init.server';
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv extends z.infer<typeof schema> {}
+  }
+}
 
-init();
+const schema = z.object({});
+schema.parse(process.env);
+
+if (import.meta.env.DEV && import.meta.env.MSW) {
+  const server = await import('~/mocks/node').then((m) => m.server);
+
+  server.listen({
+    onUnhandledRequest(request, print) {
+      if (request.url.includes('__rrdt')) {
+        return;
+      }
+
+      print.warning();
+    },
+  });
+}
 
 export const streamTimeout = 5000;
 
@@ -64,7 +84,7 @@ function handleRequest(
             }),
           );
 
-          pipe(import.meta.env.SENTRY_DSN ? Sentry.getMetaTagTransformer(body) : body);
+          pipe(Sentry.getMetaTagTransformer(body));
         },
       },
     );
@@ -72,9 +92,8 @@ function handleRequest(
     setTimeout(abort, streamTimeout + 1000);
   });
 }
-export default import.meta.env.SENTRY_DSN
-  ? Sentry.wrapSentryHandleRequest(handleRequest)
-  : handleRequest;
+
+export default Sentry.wrapSentryHandleRequest(handleRequest);
 
 export function handleError(
   error: unknown,
@@ -90,7 +109,5 @@ export function handleError(
     console.error(error);
   }
 
-  if (import.meta.env.SENTRY_DSN) {
-    Sentry.captureException(error);
-  }
+  Sentry.captureException(error);
 }

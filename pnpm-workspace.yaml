@@ -1,6 +1,6 @@
 autoInstallPeers: false
-
 onlyBuiltDependencies:
   - '@tailwindcss/oxide'
   - esbuild
+  - msw
   - unrs-resolver

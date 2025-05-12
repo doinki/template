@@ -1,4 +1,4 @@
-import { existsSync, rmSync } from 'node:fs';
+import { existsSync, globSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 
 import devServer, { defaultOptions } from '@hono/vite-dev-server';
@@ -7,7 +7,6 @@ import { sentryReactRouter } from '@sentry/react-router';
 import tailwindcss from '@tailwindcss/vite';
 import esbuild from 'esbuild';
 import { extension } from 'esbuild-plugin-extension';
-import { globSync } from 'glob';
 import { reactRouterDevTools } from 'react-router-devtools';
 import type { ConfigEnv } from 'vite';
 import { defineConfig, loadEnv } from 'vite';
@@ -46,9 +45,6 @@ export default defineConfig(async (config) => {
             org: env.SENTRY_ORG,
             project: env.SENTRY_PROJECT,
             release: { name: env.SENTRY_RELEASE },
-            sourceMapsUploadOptions: {
-              filesToDeleteAfterUpload: ['./build/**/*.map', './server-build/**/*.map'],
-            },
             telemetry: false,
           },
           config,
@@ -59,7 +55,7 @@ export default defineConfig(async (config) => {
         exclude: [...defaultOptions.exclude, /^\/app\//],
         injectClientScript: false,
       }),
-      removeSourcemap({ outDir: 'build' }),
+      removeSourcemap(['build/**/*.?(m)js', 'build/**/*.map']),
     ].filter(Boolean),
     test: {
       globals: true,
@@ -76,8 +72,8 @@ async function build(
     rmSync(outdir, { force: true, recursive: true });
   }
 
-  const entryPoints = globSync(join(import.meta.dirname, 'server', '**', '*.@(j|t)s'), {
-    ignore: ['**/*.development.@(j|t)s'],
+  const entryPoints = globSync('server/**/*.?(c|m)@(j|t)s', {
+    cwd: import.meta.dirname,
   });
 
   await esbuild
