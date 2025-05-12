@@ -1,5 +1,7 @@
 autoInstallPeers: false
 onlyBuiltDependencies:
+  - '@sentry-internal/node-cpu-profiler'
+  - '@sentry/cli'
   - '@tailwindcss/oxide'
   - esbuild
   - msw
