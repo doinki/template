@@ -77,7 +77,7 @@ async function build(
   }
 
   const entryPoints = globSync(join(import.meta.dirname, 'server', '**', '*.@(j|t)s'), {
-    ignore: ['server/**/*.development.@(j|t)s'],
+    ignore: ['**/*.development.@(j|t)s'],
   });
 
   await esbuild
