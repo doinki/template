@@ -14,7 +14,7 @@ import type {
 } from 'react-router';
 import { ServerRouter } from 'react-router';
 
-import { init } from './env.server';
+import { init } from './init.server';
 
 init();
 
