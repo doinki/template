@@ -90,6 +90,9 @@ importers:
       eslint-config-mado:
         specifier: ^0.10.0
         version: 0.10.0(@typescript-eslint/parser@8.32.0(eslint@9.26.0(jiti@2.4.2))(typescript@5.8.3))(eslint@9.26.0(jiti@2.4.2))(prettier@3.5.3)(typescript@5.8.3)
+      glob:
+        specifier: ^11.0.2
+        version: 11.0.2
       globals:
         specifier: ^16.1.0
         version: 16.1.0

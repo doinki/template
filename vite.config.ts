@@ -1,4 +1,4 @@
-import { existsSync, globSync, rmSync } from 'node:fs';
+import { existsSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 
 import devServer, { defaultOptions } from '@hono/vite-dev-server';
@@ -7,6 +7,7 @@ import { sentryReactRouter } from '@sentry/react-router';
 import tailwindcss from '@tailwindcss/vite';
 import esbuild from 'esbuild';
 import { extension } from 'esbuild-plugin-extension';
+import { globSync } from 'glob';
 import { reactRouterDevTools } from 'react-router-devtools';
 import type { ConfigEnv } from 'vite';
 import { defineConfig, loadEnv } from 'vite';
