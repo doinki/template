@@ -19,6 +19,7 @@ export default defineConfig(async (config) => {
   const env = loadEnv(config.mode, process.cwd(), '');
 
   const define = {
+    'import.meta.env.MSW': String(JSON.stringify(env.MSW)),
     'import.meta.env.SENTRY_DSN': String(JSON.stringify(env.SENTRY_DSN)),
   };
 
