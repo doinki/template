@@ -49,6 +49,9 @@ export default defineConfig((config) => {
       }),
       removeSourcemap(['build/**/*.?(m)js', 'build/**/*.map']),
     ].filter(Boolean),
+    server: {
+      port: 3000,
+    },
     test: {
       globals: true,
     },

@@ -1,5 +1,4 @@
 .react-router
 build
 node_modules
-server-build
 .env

@@ -5,7 +5,6 @@ import { join } from 'node:path';
 import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
 import { Hono } from 'hono';
-import { logger } from 'hono/logger';
 import type { TimingVariables } from 'hono/timing';
 import { endTime, startTime, timing } from 'hono/timing';
 import type { ServerBuild } from 'react-router';
@@ -60,8 +59,6 @@ app.get('*', async (c, next) => {
 
   return next();
 });
-
-app.use(logger());
 
 // eslint-disable-next-line import/no-unresolved
 const serverBuild: ServerBuild = await import('virtual:react-router/server-build');

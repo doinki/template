@@ -24,7 +24,8 @@ RUN addgroup -g 1001 -S nodejs && \
     adduser -u 1001 -S nodejs && \
     chown -R nodejs:nodejs /app
 
-COPY --from=builder --chown=nodejs:nodejs /app/node_modules /app/build /app/server-build ./
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules node_modules
+COPY --from=builder --chown=nodejs:nodejs /app/build build
 COPY --chown=nodejs:nodejs package.json ./
 
 USER nodejs
@@ -33,4 +34,4 @@ ENV NODE_ENV=production \
     HOST=0.0.0.0 \
     PORT=3000
 
-CMD ["node", "server-build/index.js"]
+CMD ["node", "build/server/index.js"]

@@ -132,4 +132,3 @@ dist
 # React Router
 .react-router/
 build/
-server-build/
