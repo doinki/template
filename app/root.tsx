@@ -1,5 +1,3 @@
-import './tailwind.css';
-
 import * as Sentry from '@sentry/react-router';
 import { useTranslation } from 'react-i18next';
 import {
@@ -16,7 +14,12 @@ import {
 import type { Route } from './+types/root';
 import { LanguageUpdater } from './components/language-updater';
 import { defaultLanguage, supportedLanguages } from './locales';
+import tailwindcss from './tailwind.css?url';
 import { Progress } from './ui/progress';
+
+export const links: Route.LinksFunction = () => {
+  return [{ href: tailwindcss, rel: 'stylesheet' }];
+};
 
 export function loader({ params, request }: Route.LoaderArgs) {
   let lang = params.lang as (typeof supportedLanguages)[number];

@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+
 import devServer, { defaultOptions } from '@hono/vite-dev-server';
 import { reactRouter } from '@react-router/dev/vite';
 import { sentryReactRouter } from '@sentry/react-router';
@@ -18,7 +20,26 @@ export default defineConfig((config) => {
 
   return {
     build: {
-      rollupOptions: config.isSsrBuild ? { input: 'server/index.ts' } : undefined,
+      rollupOptions: {
+        input: config.isSsrBuild ? 'server/index.ts' : undefined,
+        output: {
+          assetFileNames: (config) => {
+            return `assets/${createHash('sha256')
+              .update(config.names.reduce((prev, curr) => prev + curr))
+              .digest('hex')
+              .substring(0, 6)}-[hash:10][extname]`;
+          },
+          chunkFileNames: ({ name }) =>
+            `assets/${createHash('sha256').update(name).digest('hex').substring(0, 6)}-[hash:10].js`,
+          entryFileNames: ({ name }) =>
+            `assets/${createHash('sha256').update(name).digest('hex').substring(0, 6)}-[hash:10].js`,
+          manualChunks: (id) => {
+            if (/\.pnpm\/(?:react|react-dom|scheduler)@/.test(id)) {
+              return 'react';
+            }
+          },
+        },
+      },
       sourcemap: true,
       // https://tailwindcss.com/docs/compatibility#browser-support
       target: config.isSsrBuild ? 'node22' : ['chrome111', 'safari16.4', 'firefox128'],
