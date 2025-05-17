@@ -6,6 +6,7 @@ import * as Sentry from '@sentry/react-router';
 import { isbot } from 'isbot';
 import type { RenderToPipeableStreamOptions } from 'react-dom/server';
 import { renderToPipeableStream } from 'react-dom/server';
+import { I18nextProvider } from 'react-i18next';
 import type {
   ActionFunctionArgs,
   AppLoadContext,
@@ -57,7 +58,9 @@ function handleRequest(
     loadContext.timing.startTime('render');
 
     const { abort, pipe } = renderToPipeableStream(
-      <ServerRouter context={routerContext} url={request.url} />,
+      <I18nextProvider i18n={loadContext.i18next}>
+        <ServerRouter context={routerContext} url={request.url} />
+      </I18nextProvider>,
       {
         onError(error: unknown) {
           responseStatusCode = 500;
