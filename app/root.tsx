@@ -1,7 +1,6 @@
 import * as Sentry from '@sentry/react-router';
 import { useTranslation } from 'react-i18next';
 import {
-  data,
   isRouteErrorResponse,
   Links,
   Meta,
@@ -21,7 +20,11 @@ export const links: Route.LinksFunction = () => {
   return [{ href: tailwindcss, rel: 'stylesheet' }];
 };
 
-export function loader({ params, request }: Route.LoaderArgs) {
+export const shouldRevalidate = () => {
+  return false;
+};
+
+export const loader = ({ params, request }: Route.LoaderArgs) => {
   let lang = params.lang as (typeof supportedLanguages)[number];
 
   if (params.lang === defaultLanguage) {
@@ -36,15 +39,8 @@ export function loader({ params, request }: Route.LoaderArgs) {
     throw new Response(null, { status: 404 });
   }
 
-  return data(
-    { lang },
-    {
-      headers: {
-        Link: `</locales/${lang}.json>; rel=preload; as=fetch; crossorigin=anonymous`,
-      },
-    },
-  );
-}
+  return { lang };
+};
 
 export const headers: Route.HeadersFunction = ({ loaderHeaders }) => ({
   Link: loaderHeaders.get('Link') || '',
@@ -60,6 +56,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta content="width=device-width, initial-scale=1" name="viewport" />
         <Meta />
         <Links />
+        <link
+          as="fetch"
+          crossOrigin="anonymous"
+          href={`/locales/${i18n.language}.json`}
+          rel="preload"
+        />
       </head>
       <body>
         {children}

@@ -12,8 +12,8 @@ export const handle: SeoHandle | undefined = serverOnly$({
   },
 });
 
-export async function loader({ context, request }: Route.LoaderArgs) {
+export const loader = ({ context, request }: Route.LoaderArgs) => {
   return generateSitemap(request, context.serverBuild.routes, {
     url: getDomainUrl(request),
   });
-}
+};

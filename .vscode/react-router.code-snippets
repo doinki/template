@@ -5,9 +5,9 @@
     "body": [
       "import type { Route } from './+types/${TM_FILENAME_BASE}';",
       "",
-      "export async function action({ request }: Route.ActionArgs) {",
+      "export const action = async ({ request }: Route.ActionArgs) => {",
       "  return {};",
-      "}",
+      "};",
     ],
   },
   "clientAction": {
@@ -16,9 +16,9 @@
     "body": [
       "import type { Route } from './+types/${TM_FILENAME_BASE}';",
       "",
-      "export async function clientAction({ request }: Route.ClientActionArgs) {",
+      "export const clientAction = async ({ request }: Route.ClientActionArgs) => {",
       "  return {};",
-      "}",
+      "};",
     ],
   },
   "loader": {
@@ -27,9 +27,9 @@
     "body": [
       "import type { Route } from './+types/${TM_FILENAME_BASE}';",
       "",
-      "export async function loader({ request }: Route.LoaderArgs) {",
+      "export const loader = async ({ request }: Route.LoaderArgs) => {",
       "  return {};",
-      "}",
+      "};",
     ],
   },
   "clientLoader": {
@@ -38,9 +38,9 @@
     "body": [
       "import type { Route } from './+types/${TM_FILENAME_BASE}';",
       "",
-      "export async function clientLoader({ request }: Route.ClientLoaderArgs) {",
+      "export const clientLoader = async ({ request }: Route.ClientLoaderArgs) => {",
       "  return {};",
-      "}",
+      "};",
     ],
   },
   "headers": {
@@ -78,11 +78,11 @@
     "body": [
       "import type { ShouldRevalidateFunctionArgs } from 'react-router';",
       "",
-      "export function shouldRevalidate({",
+      "export const shouldRevalidate = ({",
       "  defaultShouldRevalidate,",
-      "}: ShouldRevalidateFunctionArgs): boolean {",
+      "}: ShouldRevalidateFunctionArgs): boolean => {",
       "  return defaultShouldRevalidate;",
-      "}",
+      "};",
     ],
   },
 }

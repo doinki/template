@@ -76,11 +76,7 @@ const serverBuild: ServerBuild = await import('virtual:react-router/server-build
 app.use(
   i18n({
     fallbackLng: defaultLanguage,
-    getLanguage: (c) =>
-      getLanguage(c.req.path, {
-        defaultLanguage,
-        supportedLanguages,
-      }),
+    getLanguage: (c) => getLanguage(c.req.path),
     resources: {
       en: {
         translation: en,

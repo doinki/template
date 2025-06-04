@@ -6,7 +6,7 @@ import { hydrateRoot } from 'react-dom/client';
 import { I18nextProvider, initReactI18next } from 'react-i18next';
 import { HydratedRouter } from 'react-router/dom';
 
-import { defaultLanguage, getLanguage, supportedLanguages } from './locales';
+import { getLanguage, supportedLanguages } from './locales';
 
 if (import.meta.env.DEV && import.meta.env.MSW) {
   const worker = await import('~/mocks/browser').then((m) => m.worker);
@@ -38,10 +38,7 @@ i18next
     interpolation: {
       escapeValue: false,
     },
-    lng: getLanguage(window.location.pathname, {
-      defaultLanguage,
-      supportedLanguages,
-    }),
+    lng: getLanguage(window.location.pathname),
     react: {
       useSuspense: false,
     },

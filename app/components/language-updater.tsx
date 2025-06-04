@@ -1,19 +1,16 @@
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 
-import { useIsomorphicLayoutEffect } from '~/hooks/use-isomorphic-layout-effect';
-import { getLanguage, supportedLanguages } from '~/locales';
+import { getLanguage } from '~/locales';
 
 export function LanguageUpdater() {
   const location = useLocation();
-  const locale = getLanguage(location.pathname, {
-    defaultLanguage: supportedLanguages[0],
-    supportedLanguages,
-  });
+  const locale = getLanguage(location.pathname);
 
   const { i18n } = useTranslation();
 
-  useIsomorphicLayoutEffect(() => {
+  useEffect(() => {
     if (i18n.language !== locale) {
       i18n.changeLanguage(locale);
     }

@@ -11,7 +11,7 @@ export const handle: SeoHandle | undefined = serverOnly$({
   },
 });
 
-export function loader({ request }: Route.LoaderArgs) {
+export const loader = ({ request }: Route.LoaderArgs) => {
   const robots = `User-agent: *\nAllow: /\n\nSitemap: ${getDomainUrl(request)}/sitemap.xml`;
 
   return new Response(robots, {
@@ -19,4 +19,4 @@ export function loader({ request }: Route.LoaderArgs) {
       'Content-Type': 'text/plain',
     },
   });
-}
+};
