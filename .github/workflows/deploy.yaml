@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/pnpm-install
-      - run: pnpm run lint
+      - run: pnpm exec react-router typegen && pnpm run lint
 
   typecheck:
     runs-on: ubuntu-latest
