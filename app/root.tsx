@@ -1,16 +1,8 @@
-import * as Sentry from '@sentry/react-router';
 import { useTranslation } from 'react-i18next';
-import {
-  isRouteErrorResponse,
-  Links,
-  Meta,
-  Outlet,
-  redirect,
-  Scripts,
-  ScrollRestoration,
-} from 'react-router';
+import { Links, Meta, Outlet, redirect, Scripts, ScrollRestoration } from 'react-router';
 
 import type { Route } from './+types/root';
+import { GeneralErrorBoundary } from './components/error-boundary';
 import { LanguageUpdater } from './components/language-updater';
 import { defaultLanguage, supportedLanguages } from './locales';
 import tailwindcss from './tailwind.css?url';
@@ -28,7 +20,10 @@ export const loader = ({ params, request }: Route.LoaderArgs) => {
   let lang = params.lang as (typeof supportedLanguages)[number];
 
   if (params.lang === defaultLanguage) {
-    return redirect(request.url.replace('/' + defaultLanguage, ''));
+    const url = new URL(request.url);
+    url.pathname = url.pathname.replace(`/${defaultLanguage}`, '');
+
+    return redirect(url.href);
   }
 
   if (!lang) {
@@ -78,35 +73,6 @@ export default function App() {
   return <Outlet />;
 }
 
-export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  let message = 'Oops!';
-  let details = 'An unexpected error occurred.';
-  let stack: string | undefined;
-
-  if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? '404' : 'Error';
-    details =
-      error.status === 404 ? 'The requested page could not be found.' : error.statusText || details;
-  } else if (error && error instanceof Error) {
-    if (import.meta.env.SENTRY_DSN) {
-      Sentry.captureException(error);
-    }
-
-    if (import.meta.env.DEV) {
-      details = error.message;
-      stack = error.stack;
-    }
-  }
-
-  return (
-    <main>
-      <h1>{message}</h1>
-      <p>{details}</p>
-      {!!stack && (
-        <pre>
-          <code>{stack}</code>
-        </pre>
-      )}
-    </main>
-  );
+export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
+  return <GeneralErrorBoundary {...props} />;
 }

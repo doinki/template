@@ -1,3 +1,7 @@
+import { GeneralErrorBoundary } from '~/components/error-boundary';
+
+import type { Route } from '../+types/root';
+
 export const loader = () => {
   throw new Response('Not found', { status: 404 });
 };
@@ -7,9 +11,9 @@ export const action = () => {
 };
 
 export default function NotFound() {
-  return <ErrorBoundary />;
+  return <GeneralErrorBoundary />;
 }
 
-export function ErrorBoundary() {
-  return <h1>404</h1>;
+export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
+  return <GeneralErrorBoundary {...props} />;
 }
