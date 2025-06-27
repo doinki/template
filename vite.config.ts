@@ -44,6 +44,7 @@ export default defineConfig((config) => {
           telemetry: false,
           unstable_sentryVitePluginOptions: {
             release: {
+              name: env.COMMIT_SHA,
               setCommits: {
                 auto: true,
               },

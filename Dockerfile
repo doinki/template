@@ -15,6 +15,9 @@ RUN corepack enable pnpm
 COPY --from=deps /app/node_modules node_modules
 COPY . ./
 
+ARG COMMIT_SHA
+ENV COMMIT_SHA=$COMMIT_SHA
+
 RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN,env=SENTRY_AUTH_TOKEN \
     --mount=type=secret,id=SENTRY_DSN,env=SENTRY_DSN \
     --mount=type=secret,id=SENTRY_ORG,env=SENTRY_ORG \

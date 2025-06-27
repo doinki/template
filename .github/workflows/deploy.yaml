@@ -52,10 +52,11 @@ jobs:
 
       - uses: docker/build-push-action@v6
         with:
+          build-args: |
+            COMMIT_SHA=${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           context: .
-          platforms: linux/amd64,linux/arm64
           push: true
           secrets: |
             SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
