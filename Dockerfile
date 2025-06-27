@@ -14,7 +14,12 @@ RUN corepack enable pnpm
 
 COPY --from=deps /app/node_modules node_modules
 COPY . ./
-RUN pnpm install --frozen-lockfile --offline && \
+
+RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN,env=SENTRY_AUTH_TOKEN \
+    --mount=type=secret,id=SENTRY_DSN,env=SENTRY_DSN \
+    --mount=type=secret,id=SENTRY_ORG,env=SENTRY_ORG \
+    --mount=type=secret,id=SENTRY_PROJECT,env=SENTRY_PROJECT \
+    pnpm install --frozen-lockfile --offline && \
     pnpm build && \
     pnpm prune --ignore-scripts --prod
 

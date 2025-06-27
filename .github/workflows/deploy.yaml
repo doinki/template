@@ -52,13 +52,14 @@ jobs:
 
       - uses: docker/build-push-action@v6
         with:
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           context: .
-          build-args: |
+          platforms: linux/amd64,linux/arm64
+          push: true
+          secrets: |
             SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
             SENTRY_DSN=${{ secrets.SENTRY_DSN }}
             SENTRY_ORG=${{ secrets.SENTRY_ORG }}
             SENTRY_PROJECT=${{ secrets.SENTRY_PROJECT }}
-          push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/template:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
