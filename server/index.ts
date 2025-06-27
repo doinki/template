@@ -5,6 +5,7 @@ import { join } from 'node:path';
 
 import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
+import { ip } from 'address';
 import { Hono } from 'hono';
 import type { TimingVariables } from 'hono/timing';
 import { endTime, startTime, timing } from 'hono/timing';
@@ -34,7 +35,7 @@ declare module 'react-router' {
   }
 }
 
-await init();
+init();
 
 const app = new Hono<{ Variables: TimingVariables }>();
 
@@ -108,6 +109,13 @@ if (import.meta.env.PROD) {
   const hostname = process.env.HOST || '0.0.0.0';
   const port = Number(process.env.PORT) || 3000;
 
+  const localUrl = `http://localhost:${port}`;
+  let lanUrl: string | null = null;
+  const localIp = ip() ?? 'Unknown';
+  if (/^10\.|^172\.(1[6-9]|2\d|3[01])\.|^192\.168\./.test(localIp)) {
+    lanUrl = `http://${localIp}:${port}`;
+  }
+
   const server = serve(
     {
       fetch: app.fetch,
@@ -115,11 +123,11 @@ if (import.meta.env.PROD) {
       port,
       serverOptions: {
         keepAlive: true,
-        keepAliveTimeout: 65_000,
+        keepAliveTimeout: 20_000,
       },
     },
     () => {
-      console.log(`Server running at http://${hostname}:${port}`);
+      console.log(`Local:   ${localUrl}\n${lanUrl ? `Network: ${lanUrl}` : ''}`.trim());
     },
   );
 

@@ -1,5 +1,3 @@
-import { createHash } from 'node:crypto';
-
 import devServer, { defaultOptions } from '@hono/vite-dev-server';
 import { reactRouter } from '@react-router/dev/vite';
 import { sentryReactRouter } from '@sentry/react-router';
@@ -7,7 +5,6 @@ import tailwindcss from '@tailwindcss/vite';
 import { reactRouterDevTools } from 'react-router-devtools';
 import { defineConfig, loadEnv } from 'vite';
 import { envOnlyMacros } from 'vite-env-only';
-import { removeSourcemap } from 'vite-plugin-remove-sourcemap';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig((config) => {
@@ -22,25 +19,8 @@ export default defineConfig((config) => {
     build: {
       rollupOptions: {
         input: config.isSsrBuild ? 'server/index.ts' : undefined,
-        output: {
-          assetFileNames: (config) => {
-            return `assets/${createHash('sha256')
-              .update(config.names.reduce((prev, curr) => prev + curr))
-              .digest('hex')
-              .substring(0, 6)}-[hash:10][extname]`;
-          },
-          chunkFileNames: ({ name }) =>
-            `assets/${createHash('sha256').update(name).digest('hex').substring(0, 6)}-[hash:10].js`,
-          entryFileNames: ({ name }) =>
-            `assets/${createHash('sha256').update(name).digest('hex').substring(0, 6)}-[hash:10].js`,
-          manualChunks: (id) => {
-            if (/\.pnpm\/(?:react|react-dom|scheduler)@/.test(id)) {
-              return 'react';
-            }
-          },
-        },
       },
-      sourcemap: true,
+      sourcemap: !!env.SENTRY_AUTH_TOKEN,
       // https://tailwindcss.com/docs/compatibility#browser-support
       target: config.isSsrBuild ? 'node22' : ['chrome111', 'safari16.4', 'firefox128'],
     },
@@ -50,25 +30,34 @@ export default defineConfig((config) => {
       tailwindcss(),
       reactRouterDevTools(),
       reactRouter(),
-      env.NODE_ENV === 'production' &&
-        !!env.SENTRY_AUTH_TOKEN &&
-        sentryReactRouter(
-          {
-            authToken: env.SENTRY_AUTH_TOKEN,
-            org: env.SENTRY_ORG,
-            project: env.SENTRY_PROJECT,
-            release: { name: env.SENTRY_RELEASE },
-            telemetry: false,
+      sentryReactRouter(
+        {
+          authToken: env.SENTRY_AUTH_TOKEN,
+          bundleSizeOptimizations: {
+            excludeDebugStatements: true,
           },
-          config,
-        ),
+          org: env.SENTRY_ORG,
+          project: env.SENTRY_PROJECT,
+          sourceMapsUploadOptions: {
+            enabled: !!env.SENTRY_AUTH_TOKEN,
+          },
+          telemetry: false,
+          unstable_sentryVitePluginOptions: {
+            release: {
+              setCommits: {
+                auto: true,
+              },
+            },
+          },
+        },
+        config,
+      ),
       envOnlyMacros(),
       devServer({
         entry: 'server/index.ts',
         exclude: [...defaultOptions.exclude, /^\/app\//],
         injectClientScript: false,
       }),
-      removeSourcemap(['build/**/*.?(m)js', 'build/**/*.map']),
     ].filter(Boolean),
     server: {
       port: 3000,

@@ -80,6 +80,10 @@ function handleRequest(
           responseHeaders.set('Content-Type', 'text/html');
           loadContext.timing.endTime('render');
 
+          if (import.meta.env.PROD && !import.meta.env.SENTRY_DSN) {
+            responseHeaders.append('Document-Policy', 'js-profiling');
+          }
+
           resolve(
             new Response(stream, {
               headers: responseHeaders,

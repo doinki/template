@@ -14,18 +14,22 @@ if (import.meta.env.DEV && import.meta.env.MSW) {
   worker.start();
 }
 
-if (import.meta.env.PROD && import.meta.env.SENTRY_DSN) {
-  Sentry.init({
-    dsn: import.meta.env.SENTRY_DSN,
-    environment: import.meta.env.MODE,
-    integrations: [Sentry.browserProfilingIntegration(), Sentry.replayIntegration()],
-    replaysOnErrorSampleRate: 1.0,
-    replaysSessionSampleRate: 0.1,
-    sendDefaultPii: true,
-    tracePropagationTargets: [/^\//],
-    tracesSampleRate: 1.0,
-  });
-}
+Sentry.init({
+  dsn: import.meta.env.SENTRY_DSN,
+  enabled: import.meta.env.PROD && !!import.meta.env.SENTRY_DSN,
+  environment: import.meta.env.MODE,
+  integrations: [
+    Sentry.reactRouterTracingIntegration(),
+    Sentry.browserProfilingIntegration(),
+    Sentry.replayIntegration(),
+  ],
+  profilesSampleRate: 1.0,
+  replaysOnErrorSampleRate: 1.0,
+  replaysSessionSampleRate: 0.1,
+  sendDefaultPii: true,
+  tracePropagationTargets: [/^\//],
+  tracesSampleRate: 1.0,
+});
 
 i18next
   .use(Backend)
